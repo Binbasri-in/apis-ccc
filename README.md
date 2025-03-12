@@ -20,7 +20,7 @@ $ git clone https://github.com/hyphae/apis-common.git
 $ cd apis-common
 $ mvn install
 $ cd ../
-$ git cone https://github.com/hyphae/apis-ccc.git
+$ git clone https://github.com/hyphae/apis-ccc.git
 $ cd apis-ccc
 $ mvn package
 ```
