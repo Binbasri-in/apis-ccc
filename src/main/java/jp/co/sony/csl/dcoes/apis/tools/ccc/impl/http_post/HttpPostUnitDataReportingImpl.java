@@ -139,6 +139,20 @@ public class HttpPostUnitDataReportingImpl implements UnitDataReporting.Impl {
 				}
 			});
 		}
+		/**
+ 		* NOTE: The method {@code HttpClient.post(String, Handler<HttpClientResponse>)} used below is deprecated
+ 		* in newer versions of Vert.x. However, this project currently targets Vert.x 3.5.3, where this method is
+ 		* the supported and appropriate way to perform simple HTTP POST requests.
+ 		*
+ 		* It is acceptable to continue using this method for now because:
+ 		* - The newer, preferred API ({@code request(HttpMethod, ...)} or {@code WebClient}) was introduced in later
+ 		*   Vert.x versions (3.6+ for request-based API, 3.5.4+ for WebClient).
+ 		* - Upgrading Vert.x is not feasible at this time due to compatibility constraints across the project.
+ 		*
+ 		* Refactoring to the modern API should be planned once the project is upgraded to a newer Vert.x version
+ 		* (3.6+ or 4.x) to ensure forward compatibility and eliminate deprecation warnings.
+ 		*/
+		@SuppressWarnings("deprecation")
 		private void post_(Handler<AsyncResult<Void>> completionHandler) {
 			Long requestTimeoutMsec = VertxConfig.config.getLong(DEFAULT_REQUEST_TIMEOUT_MSEC, "unitDataReporting", "requestTimeoutMsec");
 			client_.post(uri_, resPost -> {
