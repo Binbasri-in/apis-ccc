@@ -1,5 +1,7 @@
 # apis-ccc
 
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/hyphae/apis-ccc/badge)](https://scorecard.dev/viewer/?uri=github.com/hyphae/apis-ccc)
+
 ## Introduction
 apis-ccc is client software for uploading information that is related to energy sharing to external services such as a server and downloading node configuration files from a server for operation and maintenance. It constructs clusters by using the functions of the Vert.x and Hazelcast frameworks to obtain information from apis-main that is running on multiple nodes that are connected via Ethernet or other communication lines. From the Grid Master in the cluster, it then obtains information on the hardware of each node, software information related to apis-main, and node-specific information. In that way, information on any node can be obtained. apis-ccc also has a function for downloading configuration files upon request from apis-main.
 
