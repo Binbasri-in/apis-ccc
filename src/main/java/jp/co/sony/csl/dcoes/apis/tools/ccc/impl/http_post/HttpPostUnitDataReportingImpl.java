@@ -152,24 +152,71 @@ public class HttpPostUnitDataReportingImpl implements UnitDataReporting.Impl {
  		* Refactoring to the modern API should be planned once the project is upgraded to a newer Vert.x version
  		* (3.6+ or 4.x) to ensure forward compatibility and eliminate deprecation warnings.
  		*/
-		@SuppressWarnings("deprecation")
+		// @SuppressWarnings("deprecation")
+		// private void post_(Handler<AsyncResult<Void>> completionHandler) {
+		// 	Long requestTimeoutMsec = VertxConfig.config.getLong(DEFAULT_REQUEST_TIMEOUT_MSEC, "unitDataReporting", "requestTimeoutMsec");
+		// 	client_.post(uri_, resPost -> {
+		// 		if (log.isDebugEnabled()) log.debug("status : " + resPost.statusCode());
+		// 		if (resPost.statusCode() == 200) {
+		// 			completionHandler.handle(Future.succeededFuture());
+		// 		} else {
+		// 			resPost.bodyHandler(error -> {
+		// 				completionHandler.handle(Future.failedFuture("http post failed : " + resPost.statusCode() + " : " + resPost.statusMessage() + " : " + error));
+		// 			}).exceptionHandler(t -> {
+		// 				completionHandler.handle(Future.failedFuture("http post failed : " + resPost.statusCode() + " : " + resPost.statusMessage() + " : " + t));
+		// 			});
+		// 		}
+		// 	}).setTimeout(requestTimeoutMsec).exceptionHandler(t -> {
+		// 		completionHandler.handle(Future.failedFuture(t));
+		// 	}).putHeader("content-type", "application/json").putHeader("content-length", String.valueOf(body_.length())).write(body_).end();
+		// }
+
 		private void post_(Handler<AsyncResult<Void>> completionHandler) {
-			Long requestTimeoutMsec = VertxConfig.config.getLong(DEFAULT_REQUEST_TIMEOUT_MSEC, "unitDataReporting", "requestTimeoutMsec");
-			client_.post(uri_, resPost -> {
-				if (log.isDebugEnabled()) log.debug("status : " + resPost.statusCode());
-				if (resPost.statusCode() == 200) {
-					completionHandler.handle(Future.succeededFuture());
-				} else {
-					resPost.bodyHandler(error -> {
-						completionHandler.handle(Future.failedFuture("http post failed : " + resPost.statusCode() + " : " + resPost.statusMessage() + " : " + error));
-					}).exceptionHandler(t -> {
-						completionHandler.handle(Future.failedFuture("http post failed : " + resPost.statusCode() + " : " + resPost.statusMessage() + " : " + t));
-					});
-				}
-			}).setTimeout(requestTimeoutMsec).exceptionHandler(t -> {
-				completionHandler.handle(Future.failedFuture(t));
-			}).putHeader("content-type", "application/json").putHeader("content-length", String.valueOf(body_.length())).write(body_).end();
-		}
+            Long requestTimeoutMsec = VertxConfig.config.getLong(DEFAULT_REQUEST_TIMEOUT_MSEC, "unitDataReporting", "requestTimeoutMsec");
+            
+            // 1. Create the request future asynchronously
+            client_.request(io.vertx.core.http.HttpMethod.POST, uri_).onComplete(reqResult -> {
+                if (reqResult.failed()) {
+                    completionHandler.handle(Future.failedFuture(reqResult.cause()));
+                    return;
+                }
+
+                io.vertx.core.http.HttpClientRequest req = reqResult.result();
+
+                // Configure request settings and headers
+                req.setTimeout(requestTimeoutMsec);
+                req.putHeader("content-type", "application/json");
+                req.putHeader("content-length", String.valueOf(body_.length()));
+
+                // 2. Setup exception handler for network/connection issues
+                req.exceptionHandler(t -> {
+                    completionHandler.handle(Future.failedFuture(t));
+                });
+
+                // 3. Send the request payload and process the response
+                req.send(body_, resPostResult -> {
+                    if (resPostResult.failed()) {
+                        completionHandler.handle(Future.failedFuture(resPostResult.cause()));
+                        return;
+                    }
+
+                    io.vertx.core.http.HttpClientResponse resPost = resPostResult.result();
+
+                    if (log.isDebugEnabled()) log.debug("status : " + resPost.statusCode());
+                    
+                    if (resPost.statusCode() == 200) {
+                        completionHandler.handle(Future.succeededFuture());
+                    } else {
+                        // Handle reading the error response body
+                        resPost.bodyHandler(error -> {
+                            completionHandler.handle(Future.failedFuture("http post failed : " + resPost.statusCode() + " : " + resPost.statusMessage() + " : " + error));
+                        }).exceptionHandler(t -> {
+                            completionHandler.handle(Future.failedFuture("http post failed : " + resPost.statusCode() + " : " + resPost.statusMessage() + " : " + t));
+                        });
+                    }
+                });
+            });
+        }
 	}
 
 }

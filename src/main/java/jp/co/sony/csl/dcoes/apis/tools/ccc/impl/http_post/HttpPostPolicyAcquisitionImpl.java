@@ -122,36 +122,99 @@ public class HttpPostPolicyAcquisitionImpl implements PolicyAcquisition.Impl {
  		* Refactoring to the modern API should be planned once the project is upgraded to a newer Vert.x version
  		* (3.6+ or 4.x) to ensure forward compatibility and eliminate deprecation warnings.
  		*/
-		@SuppressWarnings("deprecation")
+		// @SuppressWarnings("deprecation")
+		// private void post_(Handler<AsyncResult<JsonObject>> completionHandler) {
+		// 	Long requestTimeoutMsec = VertxConfig.config.getLong(DEFAULT_REQUEST_TIMEOUT_MSEC, "policyAcquisition", "requestTimeoutMsec");
+		// 	client_.post(uri_, resPost -> {
+		// 		if (log.isDebugEnabled()) log.debug("status : " + resPost.statusCode());
+		// 		if (resPost.statusCode() == 200) {
+		// 			resPost.bodyHandler(buffer -> {
+		// 				String resp = String.valueOf(buffer);
+		// 				if (0 < resp.length()) {
+		// 					JsonObject result = new JsonObject(resp);
+		// 					if (log.isDebugEnabled()) log.debug("result : " + result);
+		// 					completionHandler.handle(Future.succeededFuture(result));
+		// 				} else {
+		// 					if (log.isDebugEnabled()) log.debug("result : null");
+		// 					completionHandler.handle(Future.succeededFuture());
+		// 				}
+		// 			}).exceptionHandler(t -> {
+		// 				completionHandler.handle(Future.failedFuture(t));
+		// 			});
+		// 		} else {
+		// 			resPost.bodyHandler(error -> {
+		// 				completionHandler.handle(Future.failedFuture("http post failed : " + resPost.statusCode() + " : " + resPost.statusMessage() + " : " + error));
+		// 			}).exceptionHandler(t -> {
+		// 				completionHandler.handle(Future.failedFuture("http post failed : " + resPost.statusCode() + " : " + resPost.statusMessage() + " : " + t));
+		// 			});
+		// 		}
+		// 	}).setTimeout(requestTimeoutMsec).exceptionHandler(t -> {
+		// 		completionHandler.handle(Future.failedFuture(t));
+		// 	}).putHeader("content-type", "application/x-www-form-urlencoded").putHeader("content-length", String.valueOf(body_.length())).write(body_).end();
+		// }
+
 		private void post_(Handler<AsyncResult<JsonObject>> completionHandler) {
-			Long requestTimeoutMsec = VertxConfig.config.getLong(DEFAULT_REQUEST_TIMEOUT_MSEC, "policyAcquisition", "requestTimeoutMsec");
-			client_.post(uri_, resPost -> {
-				if (log.isDebugEnabled()) log.debug("status : " + resPost.statusCode());
-				if (resPost.statusCode() == 200) {
-					resPost.bodyHandler(buffer -> {
-						String resp = String.valueOf(buffer);
-						if (0 < resp.length()) {
-							JsonObject result = new JsonObject(resp);
-							if (log.isDebugEnabled()) log.debug("result : " + result);
-							completionHandler.handle(Future.succeededFuture(result));
-						} else {
-							if (log.isDebugEnabled()) log.debug("result : null");
-							completionHandler.handle(Future.succeededFuture());
-						}
-					}).exceptionHandler(t -> {
-						completionHandler.handle(Future.failedFuture(t));
-					});
-				} else {
-					resPost.bodyHandler(error -> {
-						completionHandler.handle(Future.failedFuture("http post failed : " + resPost.statusCode() + " : " + resPost.statusMessage() + " : " + error));
-					}).exceptionHandler(t -> {
-						completionHandler.handle(Future.failedFuture("http post failed : " + resPost.statusCode() + " : " + resPost.statusMessage() + " : " + t));
-					});
-				}
-			}).setTimeout(requestTimeoutMsec).exceptionHandler(t -> {
-				completionHandler.handle(Future.failedFuture(t));
-			}).putHeader("content-type", "application/x-www-form-urlencoded").putHeader("content-length", String.valueOf(body_.length())).write(body_).end();
-		}
+            Long requestTimeoutMsec = VertxConfig.config.getLong(DEFAULT_REQUEST_TIMEOUT_MSEC, "policyAcquisition", "requestTimeoutMsec");
+            
+            // 1. Initiate the asynchronous request
+            client_.request(io.vertx.core.http.HttpMethod.POST, uri_).onComplete(reqResult -> {
+                if (reqResult.failed()) {
+                    completionHandler.handle(Future.failedFuture(reqResult.cause()));
+                    return;
+                }
+
+                io.vertx.core.http.HttpClientRequest req = reqResult.result();
+
+                // Configure request properties
+                req.setTimeout(requestTimeoutMsec);
+                req.putHeader("content-type", "application/x-www-form-urlencoded");
+                req.putHeader("content-length", String.valueOf(body_.length()));
+
+                // Handle network/connection exceptions
+                req.exceptionHandler(t -> {
+                    completionHandler.handle(Future.failedFuture(t));
+                });
+
+                // 2. Send the body and capture the response
+                req.send(body_, resPostResult -> {
+                    if (resPostResult.failed()) {
+                        completionHandler.handle(Future.failedFuture(resPostResult.cause()));
+                        return;
+                    }
+
+                    io.vertx.core.http.HttpClientResponse resPost = resPostResult.result();
+
+                    if (log.isDebugEnabled()) log.debug("status : " + resPost.statusCode());
+                    
+                    if (resPost.statusCode() == 200) {
+                        resPost.bodyHandler(buffer -> {
+                            String resp = String.valueOf(buffer);
+                            if (0 < resp.length()) {
+                                try {
+                                    JsonObject result = new JsonObject(resp);
+                                    if (log.isDebugEnabled()) log.debug("result : " + result);
+                                    completionHandler.handle(Future.succeededFuture(result));
+                                } catch (Exception e) {
+                                    // Safeguard for JSON parsing issues
+                                    completionHandler.handle(Future.failedFuture(e));
+                                }
+                            } else {
+                                if (log.isDebugEnabled()) log.debug("result : null");
+                                completionHandler.handle(Future.succeededFuture());
+                            }
+                        }).exceptionHandler(t -> {
+                            completionHandler.handle(Future.failedFuture(t));
+                        });
+                    } else {
+                        resPost.bodyHandler(error -> {
+                            completionHandler.handle(Future.failedFuture("http post failed : " + resPost.statusCode() + " : " + resPost.statusMessage() + " : " + error));
+                        }).exceptionHandler(t -> {
+                            completionHandler.handle(Future.failedFuture("http post failed : " + resPost.statusCode() + " : " + resPost.statusMessage() + " : " + t));
+                        });
+                    }
+                });
+            });
+        }
 	}
 
 }
