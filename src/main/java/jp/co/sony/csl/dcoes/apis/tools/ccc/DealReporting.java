@@ -6,8 +6,8 @@ import io.vertx.core.Promise;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import jp.co.sony.csl.dcoes.apis.common.Deal;
 import jp.co.sony.csl.dcoes.apis.common.ServiceAddress;
 import jp.co.sony.csl.dcoes.apis.common.util.vertx.JsonObjectUtil;
@@ -104,7 +104,7 @@ public class DealReporting extends AbstractVerticle {
 		startDealReportingService_(resDealReporting -> {
 			if (resDealReporting.succeeded()) {
 				if (enabled_) dealReportingTimerHandler_(0L);
-				if (log.isTraceEnabled()) log.trace("started : " + deploymentID());
+				if (log.isTraceEnabled()) log.trace("started : {}", deploymentID());
 				startPromise.complete();
 			} else {
 				startPromise.fail(resDealReporting.cause());
@@ -122,7 +122,7 @@ public class DealReporting extends AbstractVerticle {
 	 */
 	@Override public void stop() throws Exception {
 		stopped_ = true;
-		if (log.isTraceEnabled()) log.trace("stopped : " + deploymentID());
+		if (log.isTraceEnabled()) log.trace("stopped : {}", deploymentID());
 	}
 
 	////
@@ -160,13 +160,13 @@ public class DealReporting extends AbstractVerticle {
 					// Adds reporting time (actual UNIX time)
 					// 通知時間 ( 実時間の UNIX 時間 ) を追加する
 					long now = System.currentTimeMillis() / 1000;
-					if (log.isDebugEnabled()) log.debug("reportTime : " + now);
+					if (log.isDebugEnabled()) log.debug("reportTime : {}", now);
 					deal.put("reportTime", now);
 					impl_.report(deal, resReport -> {
 						if (resReport.succeeded()) {
 							req.reply("ok");
 						} else {
-							log.error("Communication failed with ServiceCenter ; " + resReport.cause());
+							log.error("Communication failed with ServiceCenter ; {}", resReport.cause());
 							req.fail(-1, resReport.cause().getMessage());
 						}
 					});
@@ -215,7 +215,7 @@ public class DealReporting extends AbstractVerticle {
 			if (rep.succeeded()) {
 				JsonArray result = rep.result().body();
 				if (result != null) {
-					if (log.isInfoEnabled()) log.info("size of result : " + result.size());
+					if (log.isInfoEnabled()) log.info("size of result : {}", result.size());
 					if (!result.isEmpty()) {
 						// Discards DEAL information that does not need to be recorded
 						// 記録する必要のない DEAL 情報を捨てる
@@ -226,11 +226,11 @@ public class DealReporting extends AbstractVerticle {
 							}
 						}
 						result = filtered;
-						if (log.isInfoEnabled()) log.info("size of filtered result : " + result.size());
+						if (log.isInfoEnabled()) log.info("size of filtered result : {}", result.size());
 					}
 					if (!result.isEmpty()) {
 						long now = System.currentTimeMillis() / 1000;
-						if (log.isDebugEnabled()) log.debug("reportTime : " + now);
+						if (log.isDebugEnabled()) log.debug("reportTime : {}", now);
 						for (Object aDeal : result) {
 							// Adds community ID and cluster ID
 							// コミュニティ ID とクラスタ ID を追加する
@@ -243,7 +243,7 @@ public class DealReporting extends AbstractVerticle {
 							if (resReport.succeeded()) {
 								// nop
 							} else {
-								log.error("Communication failed with ServiceCenter ; " + resReport.cause());
+								log.error("Communication failed with ServiceCenter ; {}", resReport.cause());
 							}
 							setDealReportingTimer_();
 						});
@@ -255,7 +255,7 @@ public class DealReporting extends AbstractVerticle {
 					setDealReportingTimer_();
 				}
 			} else {
-				log.error("Communication failed on EventBus ; " + rep.cause());
+				log.error("Communication failed on EventBus ; {}", rep.cause());
 				setDealReportingTimer_();
 			}
 		});

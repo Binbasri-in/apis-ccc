@@ -5,8 +5,8 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Promise;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import jp.co.sony.csl.dcoes.apis.common.ServiceAddress;
 import jp.co.sony.csl.dcoes.apis.common.util.vertx.VertxConfig;
 import jp.co.sony.csl.dcoes.apis.tools.ccc.impl.http_post.HttpPostScenarioAcquisitionImpl;
@@ -57,7 +57,7 @@ public class ScenarioAcquisition extends AbstractVerticle {
 
 		startScenarioService_(resScenario -> {
 			if (resScenario.succeeded()) {
-				if (log.isTraceEnabled()) log.trace("started : " + deploymentID());
+				if (log.isTraceEnabled()) log.trace("started : {}", deploymentID());
 				startPromise.complete();
 			} else {
 				startPromise.fail(resScenario.cause());
@@ -72,7 +72,7 @@ public class ScenarioAcquisition extends AbstractVerticle {
 	 * @throws Exception {@inheritDoc}
 	 */
 	@Override public void stop() throws Exception {
-		if (log.isTraceEnabled()) log.trace("stopped : " + deploymentID());
+		if (log.isTraceEnabled()) log.trace("stopped : {}", deploymentID());
 	}
 
 	////
@@ -116,7 +116,7 @@ public class ScenarioAcquisition extends AbstractVerticle {
 						JsonObject result = resAcquire.result();
 						req.reply(result);
 					} else {
-						log.error("Communication failed with ServiceCenter ; " + resAcquire.cause());
+						log.error("Communication failed with ServiceCenter ; {}", resAcquire.cause());
 						req.fail(-1, resAcquire.cause().getMessage());
 					}
 				});

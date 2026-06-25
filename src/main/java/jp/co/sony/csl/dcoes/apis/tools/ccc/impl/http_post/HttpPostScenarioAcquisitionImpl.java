@@ -8,8 +8,8 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import jp.co.sony.csl.dcoes.apis.common.util.StringUtil;
 import jp.co.sony.csl.dcoes.apis.common.util.vertx.VertxConfig;
 import jp.co.sony.csl.dcoes.apis.tools.ccc.ScenarioAcquisition;
@@ -64,10 +64,10 @@ public class HttpPostScenarioAcquisitionImpl implements ScenarioAcquisition.Impl
 		Integer port = (isSsl) ? VertxConfig.config.getInteger(443, "scenarioAcquisition", "port") : VertxConfig.config.getInteger(80, "scenarioAcquisition", "port");
 		Boolean sslTrustAll = VertxConfig.config.getBoolean(false, "scenarioAcquisition", "sslTrustAll");
 		uri_ = VertxConfig.config.getString("scenarioAcquisition", "uri");
-		if (log.isInfoEnabled()) log.info("host : " + host);
-		if (log.isInfoEnabled()) log.info("port : " + port);
-		if (isSsl) if (log.isInfoEnabled()) log.info("sslTrustAll : " + sslTrustAll);
-		if (log.isInfoEnabled()) log.info("uri : " + uri_);
+		if (log.isInfoEnabled()) log.info("host : {}", host);
+		if (log.isInfoEnabled()) log.info("port : {}", port);
+		if (isSsl) if (log.isInfoEnabled()) log.info("sslTrustAll : {}", sslTrustAll);
+		if (log.isInfoEnabled()) log.info("uri : {}", uri_);
 		client_ = vertx_.createHttpClient(new HttpClientOptions().setDefaultHost(host).setDefaultPort(port).setSsl(isSsl).setTrustAll(sslTrustAll));
 	}
 
@@ -82,7 +82,7 @@ public class HttpPostScenarioAcquisitionImpl implements ScenarioAcquisition.Impl
 		body.appendString("&clusterId=").appendString(StringUtil.urlEncode(VertxConfig.clusterId()));
 		body.appendString("&unitId=").appendString(StringUtil.urlEncode(unitId));
 		body.appendString("&isMD5Password=true");
-		if (log.isDebugEnabled()) log.debug("body : " + body);
+		if (log.isDebugEnabled()) log.debug("body : {}", body);
 		new Poster_(body).execute_(completionHandler);
 	}
 
@@ -108,7 +108,7 @@ public class HttpPostScenarioAcquisitionImpl implements ScenarioAcquisition.Impl
 					completed_ = true;
 					completionHandler.handle(r);
 				} else {
-					if (log.isWarnEnabled()) log.warn("post_() result returned more than once : " + r);
+					if (log.isWarnEnabled()) log.warn("post_() result returned more than once : {}", r);
 				}
 			});
 		}
@@ -187,14 +187,14 @@ public class HttpPostScenarioAcquisitionImpl implements ScenarioAcquisition.Impl
 
 					io.vertx.core.http.HttpClientResponse resPost = resPostResult.result();
 
-					if (log.isDebugEnabled()) log.debug("status : " + resPost.statusCode());
+					if (log.isDebugEnabled()) log.debug("status : {}", resPost.statusCode());
 					
 					if (resPost.statusCode() == 200) {
 						resPost.bodyHandler(buffer -> {
 							String resp = String.valueOf(buffer);
 							if (0 < resp.length()) {
 								JsonObject result = new JsonObject(resp);
-								if (log.isDebugEnabled()) log.debug("result : " + result);
+								if (log.isDebugEnabled()) log.debug("result : {}", result);
 								completionHandler.handle(Future.succeededFuture(result));
 							} else {
 								if (log.isDebugEnabled()) log.debug("result : null");

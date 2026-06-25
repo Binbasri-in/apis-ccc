@@ -9,8 +9,8 @@ import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.ZonedDateTime;
 
@@ -68,10 +68,10 @@ public class HttpPostDealReportingImpl implements DealReporting.Impl {
 		Integer port = (isSsl) ? VertxConfig.config.getInteger(443, "dealReporting", "port") : VertxConfig.config.getInteger(80, "dealReporting", "port");
 		Boolean sslTrustAll = VertxConfig.config.getBoolean(false, "dealReporting", "sslTrustAll");
 		uri_ = VertxConfig.config.getString("dealReporting", "uri");
-		if (log.isInfoEnabled()) log.info("host : " + host);
-		if (log.isInfoEnabled()) log.info("port : " + port);
-		if (isSsl) if (log.isInfoEnabled()) log.info("sslTrustAll : " + sslTrustAll);
-		if (log.isInfoEnabled()) log.info("uri : " + uri_);
+		if (log.isInfoEnabled()) log.info("host : {}", host);
+		if (log.isInfoEnabled()) log.info("port : {}", port);
+		if (isSsl) if (log.isInfoEnabled()) log.info("sslTrustAll : {}", sslTrustAll);
+		if (log.isInfoEnabled()) log.info("uri : {}", uri_);
 		client_ = vertx_.createHttpClient(new HttpClientOptions().setDefaultHost(host).setDefaultPort(port).setSsl(isSsl).setTrustAll(sslTrustAll));
 	}
 
@@ -89,7 +89,7 @@ public class HttpPostDealReportingImpl implements DealReporting.Impl {
 			convertDateTimeField_((JsonObject) aDeal);
 		}
 		Buffer body = Buffer.buffer(deals.encode());
-		if (log.isDebugEnabled()) log.debug("body : " + body);
+		if (log.isDebugEnabled()) log.debug("body : {}", body);
 		new Poster_(body).execute_(completionHandler);
 	}
 
@@ -141,7 +141,7 @@ public class HttpPostDealReportingImpl implements DealReporting.Impl {
 					completed_ = true;
 					completionHandler.handle(r);
 				} else {
-					if (log.isWarnEnabled()) log.warn("post_() result returned more than once : " + r);
+					if (log.isWarnEnabled()) log.warn("post_() result returned more than once : {}", r);
 				}
 			});
 		}
@@ -208,8 +208,8 @@ public class HttpPostDealReportingImpl implements DealReporting.Impl {
 
                     io.vertx.core.http.HttpClientResponse resPost = resPostResult.result();
 
-                    if (log.isDebugEnabled()) log.debug("status : " + resPost.statusCode());
-                    
+                    if (log.isDebugEnabled()) log.debug("status : {}", resPost.statusCode());
+
                     if (resPost.statusCode() == 200) {
                         completionHandler.handle(Future.succeededFuture());
                     } else {

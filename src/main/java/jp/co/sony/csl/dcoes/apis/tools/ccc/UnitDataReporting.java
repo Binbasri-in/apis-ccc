@@ -5,8 +5,8 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Promise;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import jp.co.sony.csl.dcoes.apis.common.ServiceAddress;
 import jp.co.sony.csl.dcoes.apis.common.util.vertx.JsonObjectUtil;
 import jp.co.sony.csl.dcoes.apis.common.util.vertx.VertxConfig;
@@ -96,7 +96,7 @@ public class UnitDataReporting extends AbstractVerticle {
 		}
 
 		if (enabled_) unitDataReportingTimerHandler_(0L);
-		if (log.isTraceEnabled()) log.trace("started : " + deploymentID());
+		if (log.isTraceEnabled()) log.trace("started : {}", deploymentID());
 		startPromise.complete();
 	}
 
@@ -110,7 +110,7 @@ public class UnitDataReporting extends AbstractVerticle {
 	 */
 	@Override public void stop() throws Exception {
 		stopped_ = true;
-		if (log.isTraceEnabled()) log.trace("stopped : " + deploymentID());
+		if (log.isTraceEnabled()) log.trace("stopped : {}", deploymentID());
 	}
 
 	////
@@ -149,7 +149,7 @@ public class UnitDataReporting extends AbstractVerticle {
 			if (rep.succeeded()) {
 				JsonObject result = rep.result().body();
 				if (result != null) {
-					if (log.isInfoEnabled()) log.info("size of unit data : " + result.size());
+					if (log.isInfoEnabled()) log.info("size of unit data : {}", result.size());
 					if (!result.isEmpty()) {
 						// Ensures that the element is a JsonObject
 						// 要素が JsonObject であることを保証する
@@ -159,17 +159,17 @@ public class UnitDataReporting extends AbstractVerticle {
 							if (aVal instanceof JsonObject) {
 								filtered.put(aKey, aVal);
 							} else {
-								if (log.isWarnEnabled()) log.warn("invalid unitData item : " + aVal);
+								if (log.isWarnEnabled()) log.warn("invalid unitData item : {}", aVal);
 							}
 						}
 						result = filtered;
-						if (log.isInfoEnabled()) log.info("size of filtered unit data : " + result.size());
+						if (log.isInfoEnabled()) log.info("size of filtered unit data : {}", result.size());
 					}
 					if (!result.isEmpty()) {
 						// Adds data unit ID
 						// データセット ID を追加する
 						long id = System.currentTimeMillis();
-						if (log.isDebugEnabled()) log.debug("datasetId : " + id);
+						if (log.isDebugEnabled()) log.debug("datasetId : {}", id);
 						for (String aKey : result.fieldNames()) {
 							JsonObject aVal = result.getJsonObject(aKey);
 							aVal.put("datasetId", id);
@@ -178,7 +178,7 @@ public class UnitDataReporting extends AbstractVerticle {
 							if (resReport.succeeded()) {
 								// nop
 							} else {
-								log.error("Communication failed with ServiceCenter ; " + resReport.cause());
+								log.error("Communication failed with ServiceCenter ; {}", resReport.cause());
 							}
 							setUnitDataReportingTimer_();
 						});
@@ -191,7 +191,7 @@ public class UnitDataReporting extends AbstractVerticle {
 					setUnitDataReportingTimer_();
 				}
 			} else {
-				log.error("Communication failed on EventBus ; " + rep.cause());
+				log.error("Communication failed on EventBus ; {}", rep.cause());
 				setUnitDataReportingTimer_();
 			}
 		});
