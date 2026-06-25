@@ -59,17 +59,17 @@ public class UnitDataReporting extends AbstractVerticle {
 	 * - {@code CONFIG.unitDataReporting.type}
 	 * Prepares the object to be implemented.
 	 * Starts the timer.
-	 * @param startFuture {@inheritDoc}
+	 * @param startPromise {@inheritDoc}
 	 * @throws Exception {@inheritDoc}
 	 * CONFIG から設定を取得し初期化する.
 	 * - {@code CONFIG.unitDataReporting.enabled}
 	 * - {@code CONFIG.unitDataReporting.type}
 	 * 実装オブジェクトを用意する.
 	 * タイマを起動する.
-	 * @param startFuture {@inheritDoc}
+	 * @param startPromise {@inheritDoc}
 	 * @throws Exception {@inheritDoc}
 	 */
-	@Override public void start(Future<Void> startFuture) throws Exception {
+	@Override public void start(Promise<Void> startPromise) throws Exception {
 		enabled_ = VertxConfig.config.getBoolean(Boolean.TRUE, "unitDataReporting", "enabled");
 		if (enabled_) {
 			if (log.isInfoEnabled()) log.info("unitDataReporting enabled");
@@ -84,11 +84,11 @@ public class UnitDataReporting extends AbstractVerticle {
 					break;
 				}
 				if (impl_ == null) {
-					startFuture.fail("unknown CONFIG.unitDataReporting.type value : " + type);
+					startPromise.fail("unknown CONFIG.unitDataReporting.type value : " + type);
 					return;
 				}
 			} catch (Exception e) {
-				startFuture.fail(e);
+				startPromise.fail(e);
 				return;
 			}
 		} else {
@@ -97,7 +97,7 @@ public class UnitDataReporting extends AbstractVerticle {
 
 		if (enabled_) unitDataReportingTimerHandler_(0L);
 		if (log.isTraceEnabled()) log.trace("started : " + deploymentID());
-		startFuture.complete();
+		startPromise.complete();
 	}
 
 	/**

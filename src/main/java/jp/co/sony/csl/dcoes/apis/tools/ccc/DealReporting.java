@@ -62,7 +62,7 @@ public class DealReporting extends AbstractVerticle {
 	 * Prepares the object to be implemented.
 	 * Starts {@link io.vertx.core.eventbus.EventBus} service.
 	 * Starts the timer.
-	 * @param startFuture {@inheritDoc}
+	 * @param startPromise {@inheritDoc}
 	 * @throws Exception {@inheritDoc}
 	 * 起動時に呼び出される.
 	 * CONFIG から設定を取得し初期化する.
@@ -71,11 +71,11 @@ public class DealReporting extends AbstractVerticle {
 	 * 実装オブジェクトを用意する.
 	 * {@link io.vertx.core.eventbus.EventBus} サービスを起動する.
 	 * タイマを起動する.
-	 * @param startFuture {@inheritDoc}
+	 * @param startPromise {@inheritDoc}
 	 * @throws Exception {@inheritDoc}
 	 */
 
-	@Override public void start(Future<Void> startFuture) throws Exception {
+	@Override public void start(Promise<Void> startPromise) throws Exception {
 		enabled_ = VertxConfig.config.getBoolean(Boolean.TRUE, "dealReporting", "enabled");
 		if (enabled_) {
 			if (log.isInfoEnabled()) log.info("dealReporting enabled");
@@ -90,11 +90,11 @@ public class DealReporting extends AbstractVerticle {
 					break;
 				}
 				if (impl_ == null) {
-					startFuture.fail("unknown CONFIG.dealReporting.type value : " + type);
+					startPromise.fail("unknown CONFIG.dealReporting.type value : " + type);
 					return;
 				}
 			} catch (Exception e) {
-				startFuture.fail(e);
+				startPromise.fail(e);
 				return;
 			}
 		} else {
@@ -105,9 +105,9 @@ public class DealReporting extends AbstractVerticle {
 			if (resDealReporting.succeeded()) {
 				if (enabled_) dealReportingTimerHandler_(0L);
 				if (log.isTraceEnabled()) log.trace("started : " + deploymentID());
-				startFuture.complete();
+				startPromise.complete();
 			} else {
-				startFuture.fail(resDealReporting.cause());
+				startPromise.fail(resDealReporting.cause());
 			}
 		});
 	}

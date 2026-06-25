@@ -36,17 +36,17 @@ public class ScenarioAcquisition extends AbstractVerticle {
 	 * - {@code CONFIG.scenarioAcquisition.enabled}
 	 * Prepares the object to be implemented.
 	 * Starts {@link io.vertx.core.eventbus.EventBus} service. 
-	 * @param startFuture {@inheritDoc}
+	 * @param startPromise {@inheritDoc}
 	 * @throws Exception {@inheritDoc}
 	 * 起動時に呼び出される.
 	 * CONFIG から設定を取得し初期化する.
 	 * - {@code CONFIG.scenarioAcquisition.enabled}
 	 * 実装オブジェクトを用意する.
 	 * {@link io.vertx.core.eventbus.EventBus} サービスを起動する.
-	 * @param startFuture {@inheritDoc}
+	 * @param startPromise {@inheritDoc}
 	 * @throws Exception {@inheritDoc}
 	 */
-	@Override public void start(Future<Void> startFuture) throws Exception {
+	@Override public void start(Promise<Void> startPromise) throws Exception {
 		enabled_ = VertxConfig.config.getBoolean(Boolean.TRUE, "scenarioAcquisition", "enabled");
 		if (enabled_) {
 			if (log.isInfoEnabled()) log.info("scenarioAcquisition enabled");
@@ -58,9 +58,9 @@ public class ScenarioAcquisition extends AbstractVerticle {
 		startScenarioService_(resScenario -> {
 			if (resScenario.succeeded()) {
 				if (log.isTraceEnabled()) log.trace("started : " + deploymentID());
-				startFuture.complete();
+				startPromise.complete();
 			} else {
-				startFuture.fail(resScenario.cause());
+				startPromise.fail(resScenario.cause());
 			}
 		});
 	}
