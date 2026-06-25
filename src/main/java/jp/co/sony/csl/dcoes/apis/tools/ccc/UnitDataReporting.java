@@ -145,7 +145,7 @@ public class UnitDataReporting extends AbstractVerticle {
 			return;
 		}
 		if (log.isInfoEnabled()) log.info("reporting unit data ...");
-		vertx.eventBus().<JsonObject>send(ServiceAddress.GridMaster.unitDatas(), null, rep -> {
+		vertx.eventBus().<JsonObject>request(ServiceAddress.GridMaster.unitDatas(), null, rep -> {
 			if (rep.succeeded()) {
 				JsonObject result = rep.result().body();
 				if (result != null) {

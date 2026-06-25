@@ -211,7 +211,7 @@ public class DealReporting extends AbstractVerticle {
 			return;
 		}
 		if (log.isInfoEnabled()) log.info("reporting deals ...");
-		vertx.eventBus().<JsonArray>send(ServiceAddress.Mediator.deals(), null, rep -> {
+		vertx.eventBus().<JsonArray>request(ServiceAddress.Mediator.deals(), null, rep -> {
 			if (rep.succeeded()) {
 				JsonArray result = rep.result().body();
 				if (result != null) {
