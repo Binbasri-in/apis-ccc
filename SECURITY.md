@@ -1,10 +1,24 @@
-Reporting a Vulnerability
-We take the security of Hyphae seriously. We appreciate your efforts to responsibly disclose security vulnerabilities. If you believe you have found a security issue, please DO NOT open a public issue or pull request. Instead, please send a detailed email to:
+# Security policy
 
-hyphae@lfenergy.org
+## Supported versions
 
-The email should include:
+Security updates are applied to the latest release line maintained in this repository. Older major or minor lines may not receive backports unless explicitly documented in a release note.
 
-A clear description of the vulnerability.
-Steps to reproduce the vulnerability.
-The affected version(s) of the project.
+## Reporting a vulnerability
+
+Please report security issues privately so we can assess and address them before wider disclosure.
+
+Private vulnerability reporting is not currently supported.
+
+If you discover a security issue, please disclose it responsibly by contacting the maintainers via GitHub:
+- @FlawzyByte
+- @subhramit
+- @axmsoftware
+
+You may also submit a Pull Request with the remediation and request review from one of the maintainers above.
+
+Include enough detail to reproduce the issue (affected component or class, version or commit, and steps or proof of concept when possible).
+
+## Disclosure
+
+We ask that you allow a reasonable time for investigation and remediation before public disclosure, and coordinate with maintainers on timing when practical.
