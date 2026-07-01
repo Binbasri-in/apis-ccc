@@ -116,7 +116,7 @@ public class MongoDBUnitDataReportingImpl implements UnitDataReporting.Impl {
 //				if (log.isDebugEnabled()) log.debug("insert succeeded : {}", res.result());
 				completionHandler.handle(Future.succeededFuture());
 			} else {
-				log.error("Communication failed with MongoDB ; {}", res.cause());
+				log.error("Communication failed with MongoDB", res.cause());
 				log.error("unitData : {}", data);
 				completionHandler.handle(Future.failedFuture(res.cause()));
 			}

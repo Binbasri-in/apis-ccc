@@ -178,7 +178,7 @@ public class UnitDataReporting extends AbstractVerticle {
 							if (resReport.succeeded()) {
 								// nop
 							} else {
-								log.error("Communication failed with ServiceCenter ; {}", resReport.cause());
+								log.error("Communication failed with ServiceCenter", resReport.cause());
 							}
 							setUnitDataReportingTimer_();
 						});
@@ -191,7 +191,7 @@ public class UnitDataReporting extends AbstractVerticle {
 					setUnitDataReportingTimer_();
 				}
 			} else {
-				log.error("Communication failed on EventBus ; {}", rep.cause());
+				log.error("Communication failed on EventBus", rep.cause());
 				setUnitDataReportingTimer_();
 			}
 		});

@@ -115,7 +115,7 @@ public class PolicyAcquisition extends AbstractVerticle {
 						JsonObject result = resAcquire.result();
 						req.reply(result);
 					} else {
-						log.error("Communication failed with ServiceCenter ; {}", resAcquire.cause());
+						log.error("Communication failed with ServiceCenter", resAcquire.cause());
 						req.fail(-1, resAcquire.cause().getMessage());
 					}
 				});

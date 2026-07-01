@@ -128,7 +128,7 @@ public class MongoDBDealReportingImpl implements DealReporting.Impl {
 //					if (log.isDebugEnabled()) log.debug("findOneAndReplaceWithOptions succeeded : {}", res.result());
 					completionHandler.handle(Future.succeededFuture());
 				} else {
-					log.error("Communication failed with MongoDB ; {}", res.cause());
+					log.error("Communication failed with MongoDB", res.cause());
 					log.error("query : {}", query);
 					log.error("deal : {}", deal);
 					completionHandler.handle(Future.failedFuture(res.cause()));

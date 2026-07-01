@@ -166,7 +166,7 @@ public class DealReporting extends AbstractVerticle {
 						if (resReport.succeeded()) {
 							req.reply("ok");
 						} else {
-							log.error("Communication failed with ServiceCenter ; {}", resReport.cause());
+							log.error("Communication failed with ServiceCenter", resReport.cause());
 							req.fail(-1, resReport.cause().getMessage());
 						}
 					});
@@ -243,7 +243,7 @@ public class DealReporting extends AbstractVerticle {
 							if (resReport.succeeded()) {
 								// nop
 							} else {
-								log.error("Communication failed with ServiceCenter ; {}", resReport.cause());
+								log.error("Communication failed with ServiceCenter", resReport.cause());
 							}
 							setDealReportingTimer_();
 						});
@@ -255,7 +255,7 @@ public class DealReporting extends AbstractVerticle {
 					setDealReportingTimer_();
 				}
 			} else {
-				log.error("Communication failed on EventBus ; {}", rep.cause());
+				log.error("Communication failed on EventBus", rep.cause());
 				setDealReportingTimer_();
 			}
 		});

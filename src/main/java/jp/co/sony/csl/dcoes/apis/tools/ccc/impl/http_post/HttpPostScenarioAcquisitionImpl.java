@@ -150,9 +150,13 @@ public class HttpPostScenarioAcquisitionImpl implements ScenarioAcquisition.Impl
 						resPost.bodyHandler(buffer -> {
 							String resp = String.valueOf(buffer);
 							if (0 < resp.length()) {
-								JsonObject result = new JsonObject(resp);
-								if (log.isDebugEnabled()) log.debug("result : {}", result);
-								completionHandler.handle(Future.succeededFuture(result));
+								try {
+									JsonObject result = new JsonObject(resp);
+									if (log.isDebugEnabled()) log.debug("result : {}", result);
+									completionHandler.handle(Future.succeededFuture(result));
+								} catch (Exception e) {
+									completionHandler.handle(Future.failedFuture(e));
+								}
 							} else {
 								if (log.isDebugEnabled()) log.debug("result : null");
 								completionHandler.handle(Future.succeededFuture());
