@@ -112,49 +112,6 @@ public class HttpPostScenarioAcquisitionImpl implements ScenarioAcquisition.Impl
 				}
 			});
 		}
-		/**
- 		* NOTE: The method {@code HttpClient.post(String, Handler<HttpClientResponse>)} used below is deprecated
- 		* in newer versions of Vert.x. However, this project currently targets Vert.x 3.5.3, where this method is
- 		* the supported and appropriate way to perform simple HTTP POST requests.
- 		*
- 		* It is acceptable to continue using this method for now because:
-		* - The newer, preferred API ({@code request(HttpMethod, ...)} or {@code WebClient}) was introduced in later
- 		*   Vert.x versions (3.6+ for request-based API, 3.5.4+ for WebClient).
- 		* - Upgrading Vert.x is not feasible at this time due to compatibility constraints across the project.
- 		*
- 		* Refactoring to the modern API should be planned once the project is upgraded to a newer Vert.x version
- 		* (3.6+ or 4.x) to ensure forward compatibility and eliminate deprecation warnings.
- 		*/
-		// @SuppressWarnings("deprecation")
-		// private void post_(Handler<AsyncResult<JsonObject>> completionHandler) {
-		// 	Long requestTimeoutMsec = VertxConfig.config.getLong(DEFAULT_REQUEST_TIMEOUT_MSEC, "scenarioAcquisition", "requestTimeoutMsec");
-		// 	client_.post(uri_, resPost -> {
-		// 		if (log.isDebugEnabled()) log.debug("status : " + resPost.statusCode());
-		// 		if (resPost.statusCode() == 200) {
-		// 			resPost.bodyHandler(buffer -> {
-		// 				String resp = String.valueOf(buffer);
-		// 				if (0 < resp.length()) {
-		// 					JsonObject result = new JsonObject(resp);
-		// 					if (log.isDebugEnabled()) log.debug("result : " + result);
-		// 					completionHandler.handle(Future.succeededFuture(result));
-		// 				} else {
-		// 					if (log.isDebugEnabled()) log.debug("result : null");
-		// 					completionHandler.handle(Future.succeededFuture());
-		// 				}
-		// 			}).exceptionHandler(t -> {
-		// 				completionHandler.handle(Future.failedFuture(t));
-		// 			});
-		// 		} else {
-		// 			resPost.bodyHandler(error -> {
-		// 				completionHandler.handle(Future.failedFuture("http post failed : " + resPost.statusCode() + " : " + resPost.statusMessage() + " : " + error));
-		// 			}).exceptionHandler(t -> {
-		// 				completionHandler.handle(Future.failedFuture("http post failed : " + resPost.statusCode() + " : " + resPost.statusMessage() + " : " + t));
-		// 			});
-		// 		}
-		// 	}).setTimeout(requestTimeoutMsec).exceptionHandler(t -> {
-		// 		completionHandler.handle(Future.failedFuture(t));
-		// 	}).putHeader("content-type", "application/x-www-form-urlencoded").putHeader("content-length", String.valueOf(body_.length())).write(body_).end();
-		// }
 
 		private void post_(Handler<AsyncResult<JsonObject>> completionHandler) {
 			Long requestTimeoutMsec = VertxConfig.config.getLong(DEFAULT_REQUEST_TIMEOUT_MSEC, "scenarioAcquisition", "requestTimeoutMsec");
